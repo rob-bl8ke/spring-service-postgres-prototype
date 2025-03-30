@@ -39,8 +39,8 @@ public class FasterCustomerRepositoryTest extends AbstractPostgresJupiterTest {
 		@Bean
 		public FlywayMigrationStrategy flywayMigrationStrategy() {
 			return flyway -> {
-				flyway.clean();
-				flyway.migrate();
+				// Do nothing to disable the Flyway migration action on startup without having to disable the Flyway
+				// autoconfiguration which is what spring.flyway.enabled=false would do.
 			};
 		}
 	}
@@ -64,7 +64,7 @@ public class FasterCustomerRepositoryTest extends AbstractPostgresJupiterTest {
 
         // Prove that database is clean before test.
         assertThat(this.customerRepository.findAll()).isEmpty();
-        
+
         var customer = new Customer();
         customer.setName("Brian Goetz");
         customer.setEmail("brian@email.com");

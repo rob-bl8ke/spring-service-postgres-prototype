@@ -80,3 +80,7 @@ docker exec -t db-postgresql pg_dump -U admin db-postgresql > backup.sql
 # Restore from backup
 cat backup.sql | docker exec -i db-postgresql psql -U admin -d db-postgresql
 ```
+
+# References
+
+- [Initial approach sourced from here](https://github.dev/aahlenst/fast-tests-spring-boot-flyway/blob/main/src/test/java/com/example/testing/)
