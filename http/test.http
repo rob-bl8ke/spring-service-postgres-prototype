@@ -1,0 +1,16 @@
+POST http://localhost:8080/customers
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "email": "john.doe@email.com"
+}
+
+###
+GET http://localhost:8080/customers/4767c3ba-9207-4001-8ca5-14f89efa7457
+Accept: application/json
+
+
+###
+http://localhost:8080/customers/by-email?email=john.doe@email.com
+Accept: application/json
