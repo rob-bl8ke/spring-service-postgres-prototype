@@ -9,52 +9,83 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestPropertySource;
 
+// Set specifically so as not to pull local database settings from the application.yml file.
 @ActiveProfiles("testcontainers")
 @DataJpaTest
+@TestPropertySource(properties = {
+    "spring.flyway.enabled=true",
+    "spring.flyway.locations=classpath:db/migration",
+    "spring.datasource.url=jdbc:postgresql://localhost:5532/db-postgresql",
+    "spring.datasource.driverClassName=org.postgresql.Driver",
+    "spring.datasource.username=admin",
+    "spring.datasource.password=admin",
+    "spring.flyway.clean-disabled=false"
+})
 @ContextConfiguration(
-	initializers = CustomerRepositoryTest.class,
-	classes = {
+    initializers = CustomerRepositoryTest.class,
+    classes = {
         DemoApplication.class,
-		CustomerRepository.class,
+        CustomerRepository.class,
         JpaAuditingConfig.class,
-		CustomerRepositoryTest.AdditionalTestConfiguration.class
-	}
+        CustomerRepositoryTest.AdditionalTestConfiguration.class
+    }
 )
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class CustomerRepositoryTest extends AbstractPostgresJupiterTest {
+@TestExecutionListeners(
+    value = {CleanDatabaseTestExecutionListener.class},
+    mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
+)
+@Commit
+public class CustomerRepositoryTest extends AbstractPostgresIntegrationTest {
 
     @Autowired
     CustomerRepository customerRepository;
 
-	@TestConfiguration
-	public static class AdditionalTestConfiguration {
-		@Bean
-		public FlywayMigrationStrategy flywayMigrationStrategy() {
-			return flyway -> {
-				flyway.clean();
-				flyway.migrate();
-			};
-		}
-	}
+    @TestConfiguration
+    public static class AdditionalTestConfiguration {
+        @Bean
+        public FlywayMigrationStrategy flywayMigrationStrategy() {
+            return flyway -> {
+                // Do nothing to disable the Flyway migration action on startup without having to disable the Flyway
+                // autoconfiguration which is what spring.flyway.enabled=false would do.
+            };
+        }
+    }
 
     @Test
-	void findAll_returnsAllCustomers() {
-        // assertThat(2).isEqualTo(2);
-        // assertThat(this.customerRepository).isNotNull();
+    void findAll_returnsAllCustomers() {
 
         var customer = new Customer();
         customer.setName("Brian Goetz");
         customer.setEmail("brian@email.com");
     
-    	this.customerRepository.save(customer);
+        this.customerRepository.save(customer);
     
-    	assertThat(this.customerRepository.findAll())
-    		.extracting(Customer::getName)
-    		.containsExactly("Brian Goetz");
-	}
+        assertThat(this.customerRepository.findAll())
+            .extracting(Customer::getName)
+            .containsExactly("Brian Goetz");
+    }
+
+    @Test
+    void findAll_returnsAllCustomers2() {
+
+        // Prove that database is clean before test.
+        assertThat(this.customerRepository.findAll()).isEmpty();
+
+        var customer = new Customer();
+        customer.setName("Brian Goetz");
+        customer.setEmail("brian@email.com");
+    
+        this.customerRepository.save(customer);
+    
+        assertThat(this.customerRepository.findAll())
+            .extracting(Customer::getName)
+            .containsExactly("Brian Goetz");
+    }
 }

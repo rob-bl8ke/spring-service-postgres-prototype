@@ -17,15 +17,24 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.web.servlet.MockMvc;
 
+// Set specifically so as not to pull local database settings from the application.yml file.
 @ActiveProfiles("testcontainers")
-@SpringBootTest(properties = "spring.flyway.clean-disabled=false")
+@SpringBootTest(properties = {
+    "spring.flyway.enabled=true",
+    "spring.flyway.locations=classpath:db/migration",
+    "spring.datasource.url=jdbc:postgresql://localhost:5532/db-postgresql",
+    "spring.datasource.driverClassName=org.postgresql.Driver",
+    "spring.datasource.username=admin",
+    "spring.datasource.password=admin",
+    "spring.flyway.clean-disabled=false"
+})
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestExecutionListeners(
     value = {CleanDatabaseTestExecutionListener.class},
     mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS // Retains default TestExecutionListeners.
 )
-public class CustomerControllerIntegrationTest extends AbstractPostgresJupiterTest {
+public class CustomerControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
