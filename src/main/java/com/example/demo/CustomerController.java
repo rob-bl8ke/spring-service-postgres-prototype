@@ -3,6 +3,7 @@ package com.example.demo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,9 +19,9 @@ public class CustomerController {
 
     // Endpoint to create a new customer
     @PostMapping
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<Void> createCustomer(@RequestBody Customer customer) {
         Customer savedCustomer = customerRepository.save(customer);
-        return ResponseEntity.ok(savedCustomer);
+        return ResponseEntity.created(URI.create("/customers/" + savedCustomer.getId())).build();
     }
 
     // Endpoint to find a customer by ID
