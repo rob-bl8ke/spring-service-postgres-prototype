@@ -1,6 +1,7 @@
 spring:
     flyway:
         enabled: true
+        clean-disabled: false
         locations: classpath:db/migration
 
     datasource:

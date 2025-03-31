@@ -14,9 +14,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import javax.sql.DataSource;
 
 // Set specifically so as not to pull local database settings from the application.yml file.
-@ActiveProfiles("testcontainers")
+@ActiveProfiles("local")
+@Testcontainers
 @DataJpaTest
 @TestPropertySource(properties = {
     "spring.flyway.enabled=true",
@@ -27,8 +32,9 @@ import org.springframework.test.context.TestPropertySource;
     "spring.datasource.password=admin",
     "spring.flyway.clean-disabled=false"
 })
+
+
 @ContextConfiguration(
-    initializers = CustomerRepositoryTest.class,
     classes = {
         DemoApplication.class,
         CustomerRepository.class,
@@ -42,7 +48,15 @@ import org.springframework.test.context.TestPropertySource;
     mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
 @Commit
-public class CustomerRepositoryTest extends AbstractPostgresIntegrationTest {
+public class CustomerRepositoryTest {
+
+    @Container
+    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17.4");
+    
+    // Specifically for testing the database connection.
+    // Get insight into the database connection settings.
+    @Autowired
+    DataSource dataSource;
 
     @Autowired
     CustomerRepository customerRepository;
