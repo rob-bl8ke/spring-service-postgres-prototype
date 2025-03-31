@@ -84,4 +84,7 @@ cat backup.sql | docker exec -i db-postgresql psql -U admin -d db-postgresql
 
 # References
 
+- [Spring Boot Testcontainers using MySQL with spring guru](https://www.udemy.com/course/spring-framework-6-beginner-to-guru/learn/lecture/47141073#notes). Here's the [source code](https://github.com/springframeworkguru/spring-6-rest-mvc/blob/78.3-using-dynamic-properties/src/test/java/guru/springframework/spring6restmvc/repositories/MySqlTest.java).
+    - [Newer approach with `@ServiceConnection`](https://www.udemy.com/course/spring-framework-6-beginner-to-guru/learn/lecture/47141515#notes). Here's the [source code](https://github.com/springframeworkguru/spring-6-rest-mvc/blob/78.4-Using-Service-Connection/src/test/java/guru/springframework/spring6restmvc/repositories/MySqlTest.java).
+    - [Official reference](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html)
 - [Initial approach sourced from here](https://github.dev/aahlenst/fast-tests-spring-boot-flyway/blob/main/src/test/java/com/example/testing/)

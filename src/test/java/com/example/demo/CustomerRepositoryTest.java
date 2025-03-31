@@ -51,8 +51,8 @@ import javax.sql.DataSource;
 public class CustomerRepositoryTest {
 
     @Container
-    static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17.4");
-    
+    static final PostgreSQLContainer postgresContainer = new PostgreSQLContainer("postgres:17.4");
+
     // Specifically for testing the database connection.
     // Get insight into the database connection settings.
     @Autowired
